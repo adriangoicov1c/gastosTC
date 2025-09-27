@@ -1,0 +1,45 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Análisis</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Análisis</ion-title>
+    </ion-toolbar>
+
+    
+  </ion-header>
+
+  <ion-card-content>
+
+    <select (change)="onCardChange()" [(ngModel)]="selectedCardId" class="black w-full pl-8 pr-4 py-3 rounded-lg "  >
+      <option value="0">Todas las tarjetas</option>
+      <option *ngFor="let card of tarjetas" [value]="card.id">
+        {{ card.name }}
+      </option>
+    </select>
+      <div style="display: block;">
+      <canvas
+          baseChart
+          [data]="chartData"
+          [options]="chartOptions"
+          chartType="chartType">
+        </canvas>
+    </div>
+
+
+    <ion-grid *ngIf="gastosMensuales.length > 0" style="margin-top: 20px;">
+      <ion-row>
+        <ion-col><strong>Mes</strong></ion-col>
+        <ion-col><strong>Total</strong></ion-col>
+      </ion-row>
+      <ion-row *ngFor="let gasto of gastosMensuales" class="border-b border-gray-200 py-4 dark:border-gray-700">
+        <ion-col>{{ gasto.mes }}</ion-col>
+        <ion-col>{{ gasto.total | currency:'CLP':'symbol-narrow':'1.0-0':'es-CL' }}</ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-content>

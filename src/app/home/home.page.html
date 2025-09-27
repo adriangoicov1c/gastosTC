@@ -1,20 +1,40 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="false">
   <ion-toolbar>
     <ion-title>
-      Blank
+      Tarjetas
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="false">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">Tarjetas</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+
+
+  <main class="px-4 space-y-2">
+    <div *ngFor="let item of tarjetas" [routerLink]="['/credit-card']" [queryParams]="{id: item.id}" class="flex items-center gap-4 rounded-lg bg-background-light dark:bg-background-dark p-4 shadow-sm">
+      <div class="bg-center bg-no-repeat bg-contain h-10 w-16 shrink-0 rounded" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtb2maATN39DFTk8IwKxMFwAgJ6XdNH7soKNckEskLNHsC3scpAwmJrauehK4ogRqglvz3ll49Dbs3CJwYUuR0gizunPCPYCdsUZdsWNGrlMhGHP8CspueYJP1TPR7rWoG3-PbWMoVwgpAXpeV2m-dnsrmeujow8eitsgroSmQi_1_jmxKu0n6FKnLx_IK_EVgAaadqsrIYcZvbkpJoi9NZTJ3SyVxcmoENHNYCnmdE6afaS8Qm2Q7iePpY20iCO-KPX6_k5w9GY4");'></div>
+      <div class="flex flex-col">
+        <p class="text-base font-medium text-slate-800 dark:text-white">{{item.name}}</p>
+        <p class="text-sm font-normal text-slate-500 dark:text-slate-400">Termina en 4567</p>
+      </div>
+      <span class="ml-auto text-slate-400 dark:text-slate-500">
+        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+        </svg>
+      </span>
+    </div>
+
+
+  </main>
+
+  <button routerLink="/new-credit-card" class="button_add flex  cursor-pointer items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary">
+    <svg fill="currentColor" height="30" viewBox="0 0 256 256" width="30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+    </svg>
+  </button>
 </ion-content>

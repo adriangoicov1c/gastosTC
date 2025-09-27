@@ -1,0 +1,42 @@
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nueva tarjeta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Nueva tarjeta</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="credit-card-field">
+    <label class="block text-base font-semibold text-black dark:text-white mb-2" for="nombre">Nombre</label>
+    <div class="relative">
+      <input [(ngModel)]="cardName" class="w-full pl-8 pr-4 py-3 rounded-lg " id="nombre" placeholder="Nombre de la tarjeta" type="text"/>
+    </div>
+  </div>
+  <!--
+  <div class="credit-card-field">
+    <label class="block text-base font-semibold text-black dark:text-white mb-2" for="fecha-vencimiento">Fecha vencimiento</label>
+    <div class="relative">
+      <input type="month" id="start" name="start" min="2018-03" value="2018-05" placeholder="Fecha de vencimiento" class="w-full pl-8 pr-4 py-3 rounded-lg " id="fecha-vencimiento" placeholder="MM/AA" type="text"/>
+      
+    </div>
+  </div>-->
+  <footer class="p-4 pb-8">
+    <button (click)="addCreditCard()" class="save-button w-full rounded-lg bg-primary text-white py-3 font-semibold hover:bg-primary/90 transition-colors">
+      Guardar
+    </button>
+  </footer>
+  
+</ion-content>
+
+

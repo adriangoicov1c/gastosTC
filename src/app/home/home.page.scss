@@ -25,3 +25,14 @@
 #container a {
   text-decoration: none;
 }
+
+.button_add{
+  
+  position: fixed;
+  bottom: 5%;   /* distancia desde abajo */
+  right: 40px;
+  z-index: 9999;
+  background-color: #3880ff;
+  width: 3.5rem;
+  height: 3.5rem;
+}

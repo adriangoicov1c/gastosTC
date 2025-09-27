@@ -10,4 +10,20 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'credit-card',
+    loadComponent: () => import('./credit-card/credit-card.page').then( m => m.CreditCardPage)
+  },
+  {
+    path: 'new-credit-card',
+    loadComponent: () => import('./new-credit-card/new-credit-card.page').then( m => m.NewCreditCardPage)
+  },
+  {
+    path: 'new-expense',
+    loadComponent: () => import('./new-expense/new-expense.page').then( m => m.NewExpensePage)
+  },
+  {
+    path: 'analytics',
+    loadComponent: () => import('./analytics/analytics.page').then( m => m.AnalyticsPage)
+  },
 ];
