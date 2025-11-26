@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gastos fijos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+ 
+
+  <ion-grid  style="margin-top: 20px;">
+      <ion-row>
+        <ion-col><strong>Item</strong></ion-col>
+        <ion-col><strong>Monto</strong></ion-col>
+      </ion-row>
+      <ion-row  class="border-b border-gray-200 py-4 dark:border-gray-700">
+        <ion-col>Dividendo</ion-col>
+        <ion-col>{{479010 | clpCurrency}}</ion-col>
+      </ion-row>
+      <ion-row  *ngFor="let tarjeta of tarjetas" class="border-b border-gray-200 py-4 dark:border-gray-700">
+        <ion-col>{{tarjeta.name}}</ion-col>
+        <ion-col>{{120000 | clpCurrency}}</ion-col>
+      </ion-row>
+      <ion-row  class="border-b border-gray-200 py-4 dark:border-gray-700">
+        <ion-col>Mach Premiun</ion-col>
+        <ion-col>{{4990 | clpCurrency}}</ion-col>
+      </ion-row>
+    </ion-grid>
+    <select  class="black w-full pl-8 pr-4 py-3 rounded-lg "  >
+      <option *ngFor="let card of gastosMensuales" [value]="card.mes">
+        {{ card.mes }}
+      </option>
+    </select>
+
+</ion-content>
+
+

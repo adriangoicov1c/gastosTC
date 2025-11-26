@@ -8,11 +8,11 @@
       </div>
       <p class="text-xs font-medium">Tarjetas</p>
     </a>
-    <a [ngClass]="{'text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors': !isActive}" class="flex flex-col items-center justify-center gap-1 " href="#">
+    <a routerLink="/fixed-expenses" [ngClass]="{'text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors': !isActive}" class="flex flex-col items-center justify-center gap-1 " href="#">
       <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
         <path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,16V80H48V48ZM48,208V96H208V208Z"></path>
       </svg>
-      <p class="text-xs font-medium">Gastos</p>
+      <p class="text-xs font-medium">Gastos fijos</p>
     </a>
     <a routerLink="/analytics" [ngClass]="{'text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors': !isActive}" class="flex flex-col items-center justify-center gap-1 ">
       <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">

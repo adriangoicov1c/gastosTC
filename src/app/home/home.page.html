@@ -13,8 +13,24 @@
     </ion-toolbar>
   </ion-header>
 
+  
+  <!--
+  <h2>Cargar estado de cuenta</h2>
 
+   Input para elegir PDF 
+  <input 
+    type="file" 
+    accept="application/pdf" 
+    (change)="onFileSelected($event)" 
+  />
 
+  
+  <div *ngIf="textContent" class="output">
+    <h3>Texto extraído:</h3>
+    <pre>{{ textContent }}</pre>
+  </div>
+
+  -->
   <main class="px-4 space-y-2">
     <div *ngFor="let item of tarjetas" [routerLink]="['/credit-card']" [queryParams]="{id: item.id}" class="flex items-center gap-4 rounded-lg bg-background-light dark:bg-background-dark p-4 shadow-sm">
       <div class="bg-center bg-no-repeat bg-contain h-10 w-16 shrink-0 rounded" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCtb2maATN39DFTk8IwKxMFwAgJ6XdNH7soKNckEskLNHsC3scpAwmJrauehK4ogRqglvz3ll49Dbs3CJwYUuR0gizunPCPYCdsUZdsWNGrlMhGHP8CspueYJP1TPR7rWoG3-PbWMoVwgpAXpeV2m-dnsrmeujow8eitsgroSmQi_1_jmxKu0n6FKnLx_IK_EVgAaadqsrIYcZvbkpJoi9NZTJ3SyVxcmoENHNYCnmdE6afaS8Qm2Q7iePpY20iCO-KPX6_k5w9GY4");'></div>

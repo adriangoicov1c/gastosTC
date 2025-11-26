@@ -2,66 +2,92 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CreditCard } from '../models/credit-card.model';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CreditCardService {
 
-  private cards: CreditCard[] = [
-    { 
-      id: 1, 
-      name: 'Visa BCI' ,
-      gastos: [
-        { 
-          id: 1, 
-          name: 'Restaurante', 
-          amount: 50000, 
-          date: '2024-02-12',
-          cuotas: 3,
-          total: 150000
-        },
-        { 
-          id: 2, 
-          name: 'Supermercado',
-          amount: 80000,
-          date: '2024-05-15',
-          cuotas: 6,
-          total: 480000
-        }
-      ]
-    },
-    { 
-      id: 2, 
-      name: 'Mastercard Coopeuch' ,
-      gastos: [{ 
-          id: 1, 
-          name: 'Salida al cine', 
-          amount: 50000, 
-          date: '2024-05-12',
-          cuotas: 3,
-          total: 150000
-        },
-        { 
-          id: 2, 
-          name: 'Pizzas',
-          amount: 80000,
-          date: '2024-05-15',
-          cuotas: 6,
-          total: 480000
-        }]
-    }
-  ];
+  private cards: CreditCard[] = [  ];
 
   private cardsSubject = new BehaviorSubject<CreditCard[]>(this.cards);
   cards$ = this.cardsSubject.asObservable();
 
-  constructor() {}
+  constructor(private storageService: StorageService) {
+    this.loadTarjetas();
+  }
+
+  
+   async loadTarjetas() {
+    
+    const stored = await this.storageService.getTarjetas();
+
+    //const stored = null;
+    if (stored) {
+      this.cards = stored;
+    } else {
+      // Si no hay datos, inicializa con los de ejemplo
+      this.cards =[
+      { 
+        id: 1, 
+        name: 'Visa BCI' ,
+        gastos: [
+          { 
+            id: 1, 
+            name: 'Restaurante', 
+            amount: 50000, 
+            date: '2024-02-12',
+            cuotas: 3,
+            total: 150000
+          },
+          { 
+            id: 2, 
+            name: 'Supermercado',
+            amount: 80000,
+            date: '2024-05-15',
+            cuotas: 6,
+            total: 480000
+          }
+        ]
+      },
+      { 
+        id: 2, 
+        name: 'Mastercard Coopeuch' ,
+        gastos: [{ 
+            id: 1, 
+            name: 'Salida al cine', 
+            amount: 50000, 
+            date: '2024-05-12',
+            cuotas: 3,
+            total: 150000
+          },
+          { 
+            id: 2, 
+            name: 'Pizzas',
+            amount: 80000,
+            date: '2024-05-15',
+            cuotas: 6,
+            total: 480000
+          }]
+      }
+    ];
+      await this.saveTarjetas();
+    }
+    this.cardsSubject.next(this.cards);
+  }
+
+   async saveTarjetas() {
+    await this.storageService.setTarjetas(this.cards);
+    this.cardsSubject.next(this.cards);
+  }
+
 
   // Create
-  addCard(card: CreditCard) {
+  public async addCard(card: CreditCard) {
     this.cards.push(card);
     this.cardsSubject.next(this.cards);
+    await this.saveTarjetas();
   }
 
   // Read
@@ -106,7 +132,8 @@ export class CreditCardService {
       this.cardsSubject.next([...this.cards]);
     }
 
-    console.log(this.cards);
+    
+    this.saveTarjetas();
   }
 
   getGastosProyectados(cardId: number) {
