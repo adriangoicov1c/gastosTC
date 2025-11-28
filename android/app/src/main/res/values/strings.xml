@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">gastosTC</string>
     <string name="title_activity_main">gastosTC</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="package_name">com.adriangoicovic.gastostc</string>
+    <string name="custom_url_scheme">com.adriangoicovic.gastostc</string>
 </resources>

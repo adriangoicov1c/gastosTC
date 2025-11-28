@@ -1,7 +1,7 @@
 // services/credit-card.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CreditCard } from '../models/credit-card.model';
+import { CreditCard, FixedExpense } from '../models/credit-card.model';
 import { StorageService } from './storage.service';
 
 @Injectable({
@@ -10,12 +10,35 @@ import { StorageService } from './storage.service';
 export class CreditCardService {
 
   private cards: CreditCard[] = [  ];
+  private gastos: FixedExpense[] = [];
 
   private cardsSubject = new BehaviorSubject<CreditCard[]>(this.cards);
-  cards$ = this.cardsSubject.asObservable();
+  private gastosSubject = new BehaviorSubject<FixedExpense[]>(this.gastos);
+
+  cards$ = this.cardsSubject.asObservable();  
+  gastos$ = this.gastosSubject.asObservable();
+  
 
   constructor(private storageService: StorageService) {
     this.loadTarjetas();
+    this.loadGastos();
+  }
+
+
+
+  async loadGastos() {
+    
+    const stored = await this.storageService.getGastos();
+
+    //const stored = null;
+    if (stored) {
+      this.gastos = stored;
+    } else {
+      // Si no hay datos, inicializa con los de ejemplo
+      this.gastos =[];
+      await this.saveGastos();
+    }
+    this.gastosSubject.next(this.gastos);
   }
 
   
@@ -82,17 +105,27 @@ export class CreditCardService {
     this.cardsSubject.next(this.cards);
   }
 
+  async saveGastos() {
+    await this.storageService.setGastos(this.gastos);
+    this.gastosSubject.next(this.gastos);
+  }
+
 
   // Create
   public async addCard(card: CreditCard) {
     this.cards.push(card);
     this.cardsSubject.next(this.cards);
     await this.saveTarjetas();
+    
+  }
+
+  public async addGasto(gasto: FixedExpense) {
+    this.gastos.push(gasto);
+    await this.saveGastos();
   }
 
   // Read
   getTarjetas(id?: number): CreditCard | CreditCard[] | undefined {
-    console.log(id)
     if (id !== undefined) {
       return this.cards.find(t => t.id == id);
     }
@@ -124,6 +157,26 @@ export class CreditCardService {
 
     return deleted;
   }
+
+
+  deleteExpense(id: number | string): boolean {
+    const idNum = typeof id === 'string' ? parseInt(id, 10) : id;
+
+    const prevLength = this.gastos.length;
+    this.gastos = this.gastos.filter(c => c.id !== idNum);
+    const deleted = this.gastos.length < prevLength;
+
+    if (deleted) {
+      // siempre emitir un nuevo array para OnPush y async pipe
+      this.gastosSubject.next([...this.gastos]);
+      console.log('[CreditCardService] gasto deleted, new list:', this.gastos);
+    } else {
+      console.warn('[CreditCardService] no gasto deleted (id not found)', idNum);
+    }
+
+    return deleted;
+  }
+
 
   createExpense(cardId: number, expense: { id: number; name: string; amount: number; date: string; cuotas: number; total: number }) {
     const card = this.cards.find(c => c.id == cardId);

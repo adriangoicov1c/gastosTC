@@ -5,12 +5,9 @@ import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/stan
 import { CreditCard } from '../models/credit-card.model';
 import { CreditCardService } from '../services/credit-card.service';
 import { Subscription } from 'rxjs';
-import * as pdfjsLib from "pdfjs-dist";
-import workerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 
-console.log("workerUrl:", workerUrl, typeof workerUrl);
 
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc = workerUrl;
+
 
 @Component({
   selector: 'app-home',
@@ -38,7 +35,7 @@ export class HomePage {
   deleteCard(id: number) {
     this.cardService.deleteCard(id);
   }
-  
+  /*
 
   loadPdf(): void {
     if (this.selectedPdfFile) {
@@ -52,7 +49,7 @@ export class HomePage {
       
     }
   }
-
+  
   async extractTextFromPdf(url: string): Promise<string> {
 
       const loadingTask = pdfjsLib.getDocument(url);
@@ -109,7 +106,7 @@ export class HomePage {
       }
     
     return this.textContent;
-  }
+  }*/
 
 
   

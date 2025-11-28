@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { NavController, IonicModule } from '@ionic/angular';
 import { ClpCurrencyPipe } from '../pipes/clp-currency.pipe';
 import { CreditCardService } from '../services/credit-card.service';
-import { MonthlyExpense } from '../models/credit-card.model';
+import { FixedExpense, MonthlyExpense } from '../models/credit-card.model';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -17,23 +18,59 @@ import { MonthlyExpense } from '../models/credit-card.model';
 })
 export class FixedExpensesPage implements OnInit {
 
-  private data = inject(CreditCardService);
+  private cardService = inject(CreditCardService);
   gastosMensuales: MonthlyExpense[] = [];
+  gastosFijos:any;
+  showModal = false;
   tarjetas:any;
+
+  public fixedExpensedName: string = '';
+  public fixedExpensedAmount: number = 0;
+  private sub = new Subscription();
+  
   
   constructor(private navCtrl: NavController) { 
-    this.tarjetas = this.data.getTarjetas();
-    this.gastosMensuales = this.data.getGastosProyectados(0);
+    this.tarjetas = this.cardService.getTarjetas();
+    this.gastosFijos =  this.cardService.loadGastos();
+    this.gastosMensuales = this.cardService.getGastosProyectados(0);
   }
 
   ngOnInit() {
 
-    
-    console.log(this.gastosMensuales);
+    this.sub = this.cardService.gastos$.subscribe(cs => this.gastosFijos = cs);
+    this.tarjetas = this.cardService.getTarjetas();
+    console.log(this.gastosFijos);
+    //console.log(this.gastosMensuales);
   }
 
    goBack() {
       this.navCtrl.back(); // vuelve a la página anterior en el stack
     }
+
+  closeModal() {
+    this.fixedExpensedName = '';
+    this.fixedExpensedAmount = 0;
+    this.showModal = false;
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  deleteGasto(id: number) {
+    this.cardService.deleteExpense(id);
+    this.ngOnInit();
+    // Lógica para eliminar el gasto fijo
+  }
+
+  saveFixedExpense() {
+     this.cardService.addGasto({
+        id: Math.floor(Math.random() * 10000), // Genera un ID aleatorio
+        name: this.fixedExpensedName,
+        amount: this.fixedExpensedAmount
+      });
+    // Lógica para guardar el gasto fijo
+    this.closeModal();
+  }
 
 }

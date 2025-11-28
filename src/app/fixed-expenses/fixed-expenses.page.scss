@@ -1,0 +1,39 @@
+
+.button_add{
+  
+  position: fixed;
+  bottom: 5%;   /* distancia desde abajo */
+  right: 40px;
+  z-index: 9999;
+  background-color: #3880ff;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+.width-full {
+    width: 100%;
+}
+.margin-top-5 {
+    margin-top: 1.25rem; /* 20px */
+}
+.ion-padding-bottom {
+  --padding-bottom: 80px; /* o el alto de tu footer */
+}
+
+ion-modal {
+  --width: 90vw;
+  --height: 50%;
+}
+
+
+
+ion-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #1f1f1f;
+}
+
+.width-full {
+    width: 100%;
+}

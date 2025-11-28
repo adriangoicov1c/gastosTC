@@ -18,9 +18,10 @@
         <ion-col><strong>Item</strong></ion-col>
         <ion-col><strong>Monto</strong></ion-col>
       </ion-row>
-      <ion-row  class="border-b border-gray-200 py-4 dark:border-gray-700">
-        <ion-col>Dividendo</ion-col>
-        <ion-col>{{479010 | clpCurrency}}</ion-col>
+      
+      <ion-row (click)="deleteGasto(gasto.id)" *ngFor="let gasto of gastosFijos" class="border-b border-gray-200 py-4 dark:border-gray-700">
+        <ion-col>{{gasto.name}}</ion-col>
+        <ion-col>{{gasto.amount | clpCurrency}}</ion-col>
       </ion-row>
       <ion-row  *ngFor="let tarjeta of tarjetas" class="border-b border-gray-200 py-4 dark:border-gray-700">
         <ion-col>{{tarjeta.name}}</ion-col>
@@ -37,6 +38,59 @@
       </option>
     </select>
 
+     <button (click)="openModal()" class="button_add flex  cursor-pointer items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary">
+      <svg fill="currentColor" height="30" viewBox="0 0 256 256" width="30" xmlns="http://www.w3.org/2000/svg">
+      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+      </svg>
+    </button>
+
 </ion-content>
+
+<ion-modal [isOpen]="showModal" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Agregar gasto fijo</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      
+      <ion-item>
+        
+        <div class="flex flex-col width-full margin-top-5">
+          <ion-label >Nombre</ion-label>
+          <ion-input [(ngModel)]="fixedExpensedName" autocapitalize="sentences"  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#212529] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 placeholder:text-[#6C757D] p-[15px] text-base font-normal leading-normal" id="event-name" placeholder="Ej: Cena de fin de año" value=""></ion-input>
+          
+        </div>
+        
+      </ion-item>
+      <ion-item>
+
+        <div class="flex flex-col width-full margin-top-5">
+          <ion-label>Monto</ion-label>
+          <ion-input  type="number"
+          [(ngModel)]="fixedExpensedAmount"
+            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#212529] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark h-14 placeholder:text-[#6C757D] p-[15px] text-base font-normal leading-normal"
+            id="event-value" placeholder="Ej: 10000" value=""></ion-input>
+        </div>
+
+      </ion-item>
+      <ion-footer>
+        
+        <div class="flex flex-col width-full ">
+        <ion-button (click)="saveFixedExpense()" expand="block">Guardar</ion-button>
+        
+        
+        </div>
+      </ion-footer>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
 
 

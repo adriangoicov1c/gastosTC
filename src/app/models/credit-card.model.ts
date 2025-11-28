@@ -17,3 +17,9 @@ export interface MonthlyExpense {
   mes: string;   // Ej: "mayo 2024"
   total: number; // Total de ese mes
 }
+
+export interface FixedExpense {
+  id: number;
+  name: string;
+  amount: number;
+}
