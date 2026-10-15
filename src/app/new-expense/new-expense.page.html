@@ -4,7 +4,7 @@
       <ion-button (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
-      <ion-title size="large">Nuevo gasto</ion-title>
+      <ion-title size="large">{{ editing ? 'Editar gasto' : 'Nuevo gasto' }}</ion-title>
     </ion-buttons>
 
     
@@ -15,7 +15,7 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Nuevo gasto</ion-title>
+      <ion-title size="large">{{ editing ? 'Editar gasto' : 'Nuevo gasto' }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -30,14 +30,14 @@
   <div class="credit-card-field">
     <label class="block text-base font-semibold text-black dark:text-white mb-2" for="monto">Monto</label>
     <div class="relative">
-      <input [(ngModel)]="expense.total" class="w-full pl-8 pr-4 py-3 rounded-lg " id="monto" placeholder="Monto del gasto" type="number"/>
+        <input [(ngModel)]="expense.total" class="w-full pl-8 pr-4 py-3 rounded-lg " id="monto" placeholder="Monto total de la compra" type="number" min="1"/>
     </div>
   </div>
 
   <div class="credit-card-field">
     <label class="block text-base font-semibold text-black dark:text-white mb-2" for="cuotas">Cuotas</label>
     <div class="relative">
-      <input [(ngModel)]="expense.cuotas" class="w-full pl-8 pr-4 py-3 rounded-lg " id="cuotas" placeholder="Número de cuotas" type="number"/>
+        <input [(ngModel)]="expense.cuotas" class="w-full pl-8 pr-4 py-3 rounded-lg " id="cuotas" placeholder="Número de cuotas" type="number" min="1" step="1"/>
     </div>
   </div>
 
@@ -50,7 +50,7 @@
 
     <footer class="p-4 pb-8">
       <button (click)="addExpense()" class="save-button w-full rounded-lg bg-primary text-white py-3 font-semibold hover:bg-primary/90 transition-colors">
-        Guardar
+        {{ editing ? 'Guardar cambios' : 'Guardar gasto' }}
     </button>
   </footer>
 

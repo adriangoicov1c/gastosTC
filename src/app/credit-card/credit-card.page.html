@@ -22,21 +22,27 @@
   <label class="text-lg font-medium px-4 pb-2" style="float: inline-end;">{{totalAmount | currency:'CLP':'symbol':'1.0-0'}}</label>
   
   
-  <div *ngFor="let gasto of tarjeta.gastos" class="gasto flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800/50">
+  <div *ngFor="let gasto of tarjeta?.gastos" class="gasto flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800/50">
     <div class="flex items-center justify-center size-12 rounded-lg bg-primary/10 text-primary">
-      <p class="text-sm text-gray-500 dark:text-gray-400">{{ gasto.total | currency:'CLP':'symbol':'1.0-0' }}</p>  
+      <p class="text-sm text-gray-500 dark:text-gray-400">{{ gasto.total | currency:'CLP':'symbol':'1.0-0' }}</p>
     </div>
     <div class="flex-1">
       <p class="font-medium">{{ gasto.name }}</p>
       <p class="text-sm text-gray-500 dark:text-gray-400">{{ gasto.date | date:'d MMMM y' }}</p>
     </div>
-    <p class="text-sm text-gray-500 dark:text-gray-400">{{ gasto.cuotas }} cuotas de </p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">{{ gasto.cuotas }} cuotas de</p>
     <p class="font-bold">{{ gasto.amount | currency:'CLP':'symbol-narrow':'1.0-0'}}</p>
+    <ion-button fill="clear" [routerLink]="['/new-expense']" [queryParams]="{id: tarjeta.id, expenseId: gasto.id}" aria-label="Editar gasto">
+      <ion-icon name="create-outline"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear" color="danger" (click)="deleteExpense(gasto.id, gasto.name)" aria-label="Eliminar gasto">
+      <ion-icon name="trash-outline"></ion-icon>
+    </ion-button>
   </div>
 
   
 
-  <button routerLink="/new-expense"  [queryParams]="{id: tarjeta.id}" class="button_add flex  cursor-pointer items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary">
+  <button routerLink="/new-expense"  [queryParams]="{id: tarjeta!.id, diaCorte: tarjeta!.diaCorte}" class="button_add flex  cursor-pointer items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary">
     <svg fill="currentColor" height="30" viewBox="0 0 256 256" width="30" xmlns="http://www.w3.org/2000/svg">
     <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
     </svg>

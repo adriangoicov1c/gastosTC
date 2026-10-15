@@ -5,6 +5,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, Ion
 import { NavController } from '@ionic/angular';
 import { CreditCardService } from '../services/credit-card.service';
 import { ActivatedRoute } from '@angular/router';
+import { Expense } from '../models/credit-card.model';
 
 @Component({
   selector: 'app-new-expense',
@@ -15,22 +16,35 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class NewExpensePage implements OnInit {
 
-  expense = {
+  expense: Expense = {
     id: 0,
-    name: 'Gasto de prueba',
-    amount: 30000,
-    date: '2024-05-15',
-    cuotas: 3,
-    total: 90000
+    name: '',
+    amount: 0,
+    date: this.today(),
+    cuotas: 1,
+    total: 0,
+    fechaPrimerVencimiento: new Date(),
+    fechaUltimoVencimiento: new Date()
   };
 
   idCreditCard: number = 0;
+  editing = false;
 
   constructor(private navCtrl: NavController,private cardService: CreditCardService,private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.idCreditCard = this.route.snapshot.queryParams['id'];    
-    
+    const params = this.route.snapshot.queryParams;
+    this.idCreditCard = Number(params['id']);
+    const expenseId = Number(params['expenseId']);
+    const card = this.cardService.getTarjetas(this.idCreditCard);
+    if (expenseId && card && !Array.isArray(card)) {
+      const current = card.gastos.find(item => item.id === expenseId);
+      if (current) {
+        this.expense = { ...current };
+        this.expense.date = this.toDateInput(current.date);
+        this.editing = true;
+      }
+    }
   }
 
   goBack() {
@@ -38,9 +52,57 @@ export class NewExpensePage implements OnInit {
   }
 
   addExpense() {
-    this.expense.amount = this.expense.total / this.expense.cuotas;
-    this.cardService.createExpense(this.idCreditCard, this.expense);
+    const total = Number(this.expense.total);
+    const cuotas = Math.floor(Number(this.expense.cuotas));
+    if (!this.expense.name.trim() || !this.expense.date || !Number.isFinite(total) || total <= 0 || cuotas < 1) return;
+
+    const card = this.cardService.getTarjetas(this.idCreditCard);
+    if (!card || Array.isArray(card)) return;
+    const firstDueDate = this.calcularFechaPrimerVencimiento(this.parseLocalDate(this.expense.date));
+    const lastDueDate = this.calcularFechaUltimoVencimiento(firstDueDate, cuotas);
+    const nextExpense: Expense = {
+      ...this.expense,
+      id: this.editing ? this.expense.id : Math.max(0, ...card.gastos.map(item => item.id)) + 1,
+      name: this.expense.name.trim(),
+      total,
+      cuotas,
+      amount: total / cuotas,
+      fechaPrimerVencimiento: firstDueDate,
+      fechaUltimoVencimiento: lastDueDate
+    };
+    
+    if (this.editing) this.cardService.updateExpense(this.idCreditCard, nextExpense);
+    else this.cardService.createExpense(this.idCreditCard, nextExpense);
     this.goBack();
+  }
+
+  private today(): string {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
+  private toDateInput(value: string | Date): string {
+    if (value instanceof Date) return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    return value.slice(0, 10);
+  }
+
+  private parseLocalDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  calcularFechaPrimerVencimiento(fecha: Date): Date {
+    return new Date(
+      fecha.getFullYear(),
+      fecha.getMonth() + (fecha.getDate() <= 15 ? 1 : 2),
+      1
+    );
+  }
+
+  calcularFechaUltimoVencimiento(fechaPrimerVencimiento: Date, cuotas: number): Date {
+    const fechaUltimoVencimiento = new Date(fechaPrimerVencimiento);
+    fechaUltimoVencimiento.setMonth(fechaUltimoVencimiento.getMonth() + cuotas - 1);
+    return fechaUltimoVencimiento;
   }
 
 }

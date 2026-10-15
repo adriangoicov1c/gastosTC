@@ -57,14 +57,26 @@ export class AnalyticsPage implements OnInit {
   constructor(private cardService: CreditCardService) { }
 
   ngOnInit() {
-    this.sub = this.cardService.cards$.subscribe(cs => this.tarjetas = cs);
-    this.loadData();
+    this.sub = this.cardService.cards$.subscribe(cs => {
+      this.tarjetas = cs;
+      this.loadData();
+    });
   }
 
 
 
   loadData() {
-    this.gastosMensuales = this.cardService.getGastosProyectados(this.selectedCardId ?? undefined);
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const ahora = new Date();
+    const mesActual = ahora.getFullYear() * 12 + ahora.getMonth();
+
+    this.gastosMensuales = this.cardService
+      .getGastosProyectados(Number(this.selectedCardId) || 0)
+      .filter(gasto => {
+        const [nombreMes, anio] = gasto.mes.toLowerCase().split(' ');
+        const indiceMes = meses.indexOf(nombreMes);
+        return indiceMes >= 0 && Number(anio) * 12 + indiceMes >= mesActual;
+      });
     
 
     this.chartData = {
@@ -83,62 +95,5 @@ export class AnalyticsPage implements OnInit {
     console.log('Tarjeta seleccionada:', this.selectedCardId);
     this.loadData();
   }
-
-  getGastosProyectados(cardId?: number) {
-    const cardsToProcess = cardId
-      ? this.tarjetas.filter(c => c.id === cardId)
-      : this.tarjetas;
-
-    const allGastos = cardsToProcess.reduce((acc, card) => acc.concat(card.gastos), [] as any[]);
-
-    // Aquí tu misma lógica de proyección mensual con cuotas
-    const proyeccion: { mes: string; total: number }[] = [];
-
-    allGastos.forEach((gasto: any) => {
-      const fecha = new Date(gasto.date);
-      for (let i = 0; i < gasto.cuotas; i++) {
-        const mes = new Date(fecha.getFullYear(), fecha.getMonth() + i, 1);
-        const clave = this.formatFecha(mes.toISOString());
-
-        const existente = proyeccion.find(p => p.mes === clave);
-        if (existente) {
-          existente.total += gasto.amount;
-        } else {
-          proyeccion.push({ mes: clave, total: gasto.amount });
-        }
-      }
-    });
-
-    return proyeccion.sort((a, b) =>
-      new Date(a.mes).getTime() - new Date(b.mes).getTime()
-    );
-  }
-
-
-  private mesANumero(mes: string): number {
-    const meses: { [key: string]: number } = {
-      enero: 1, febrero: 2, marzo: 3, abril: 4,
-      mayo: 5, junio: 6, julio: 7, agosto: 8,
-      septiembre: 9, octubre: 10, noviembre: 11, diciembre: 12
-    };
-    return meses[mes.toLowerCase()] || 1;
-  }
-
-  formatFecha(fecha: string): string {
-    const d = new Date(fecha);
-
-    // Esto da "mayo de 2024"
-    let texto = d.toLocaleDateString("es-CL", {
-      month: "long",
-      year: "numeric"
-    });
-
-    // Quitar " de"
-    texto = texto.replace(" de", "");
-
-    // Poner mayúscula en la primera letra
-    return texto.charAt(0).toUpperCase() + texto.slice(1);
-  }
-
 
 }

@@ -18,6 +18,7 @@ export class NewCreditCardPage implements OnInit {
 
   public cardName: string = '';
   public cardExpirationDate: string = '';
+  public diaCorte: number = 0;
 
   ngOnInit() {
   }
@@ -30,6 +31,7 @@ export class NewCreditCardPage implements OnInit {
       this.cardService.addCard({
         id: Math.floor(Math.random() * 10000), // Genera un ID aleatorio
         name: this.cardName,
+        diaCorte: this.diaCorte,
         gastos: []
       });
 

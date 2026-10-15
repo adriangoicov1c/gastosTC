@@ -58,7 +58,7 @@ export class FixedExpensesPage implements OnInit {
   }
 
   deleteGasto(id: number) {
-    this.cardService.deleteExpense(id);
+    //this.cardService.deleteExpense(id);
     this.ngOnInit();
     // Lógica para eliminar el gasto fijo
   }

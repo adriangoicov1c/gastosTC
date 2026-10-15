@@ -1,7 +1,7 @@
 // services/credit-card.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CreditCard, FixedExpense } from '../models/credit-card.model';
+import { CreditCard, Expense, FixedExpense } from '../models/credit-card.model';
 import { StorageService } from './storage.service';
 
 @Injectable({
@@ -55,6 +55,7 @@ export class CreditCardService {
       { 
         id: 1, 
         name: 'Visa BCI' ,
+        diaCorte: 15,
         gastos: [
           { 
             id: 1, 
@@ -62,7 +63,9 @@ export class CreditCardService {
             amount: 50000, 
             date: '2024-02-12',
             cuotas: 3,
-            total: 150000
+            total: 150000,
+            fechaPrimerVencimiento: new Date('2024-03-01'),
+            fechaUltimoVencimiento: new Date('2024-05-01')
           },
           { 
             id: 2, 
@@ -70,18 +73,23 @@ export class CreditCardService {
             amount: 80000,
             date: '2024-05-15',
             cuotas: 6,
-            total: 480000
+            total: 480000,
+            fechaPrimerVencimiento: new Date('2024-06-01'),
+            fechaUltimoVencimiento: new Date('2024-11-01')
           }
         ]
       },
       { 
         id: 2, 
         name: 'Mastercard Coopeuch' ,
+        diaCorte: 20,
         gastos: [{ 
             id: 1, 
             name: 'Salida al cine', 
             amount: 50000, 
             date: '2024-05-12',
+            fechaPrimerVencimiento: new Date('2024-06-01'),
+            fechaUltimoVencimiento: new Date('2024-08-01'),
             cuotas: 3,
             total: 150000
           },
@@ -91,7 +99,9 @@ export class CreditCardService {
             amount: 80000,
             date: '2024-05-15',
             cuotas: 6,
-            total: 480000
+            total: 480000,
+            fechaPrimerVencimiento: new Date('2024-06-01'),
+            fechaUltimoVencimiento: new Date('2024-11-01')
           }]
       }
     ];
@@ -135,7 +145,8 @@ export class CreditCardService {
   // Update
   updateCard(updatedCard: CreditCard) {
     this.cards = this.cards.map(c => c.id == updatedCard.id ? updatedCard : c);
-    this.cardsSubject.next(this.cards);
+    this.cardsSubject.next([...this.cards]);
+    void this.saveTarjetas();
   }
 
   // Delete
@@ -159,37 +170,44 @@ export class CreditCardService {
   }
 
 
-  deleteExpense(id: number | string): boolean {
-    const idNum = typeof id === 'string' ? parseInt(id, 10) : id;
+  deleteExpense(cardId: number | string, expenseId: number | string): boolean {
+    const parsedCardId = Number(cardId);
+    const parsedExpenseId = Number(expenseId);
+    const card = this.cards.find(c => c.id === parsedCardId);
+    if (!card) return false;
 
-    const prevLength = this.gastos.length;
-    this.gastos = this.gastos.filter(c => c.id !== idNum);
-    const deleted = this.gastos.length < prevLength;
+    const expenses = card.gastos.filter(expense => expense.id !== parsedExpenseId);
+    if (expenses.length === card.gastos.length) return false;
 
-    if (deleted) {
-      // siempre emitir un nuevo array para OnPush y async pipe
-      this.gastosSubject.next([...this.gastos]);
-      console.log('[CreditCardService] gasto deleted, new list:', this.gastos);
-    } else {
-      console.warn('[CreditCardService] no gasto deleted (id not found)', idNum);
-    }
-
-    return deleted;
+    this.cards = this.cards.map(c => c.id === parsedCardId ? { ...c, gastos: expenses } : c);
+    this.cardsSubject.next([...this.cards]);
+    void this.saveTarjetas();
+    return true;
   }
 
 
-  createExpense(cardId: number, expense: { id: number; name: string; amount: number; date: string; cuotas: number; total: number }) {
+  createExpense(cardId: number, expense: Expense) {
     const card = this.cards.find(c => c.id == cardId);
     if (card) {
-      card.gastos.push(expense);
+      card.gastos = [...card.gastos, expense];
       this.cardsSubject.next([...this.cards]);
+      void this.saveTarjetas();
     }
-
-    
-    this.saveTarjetas();
   }
 
-  getGastosProyectados(cardId: number) {
+  updateExpense(cardId: number, updatedExpense: Expense): boolean {
+    const card = this.cards.find(c => c.id === Number(cardId));
+    if (!card || !card.gastos.some(expense => expense.id === updatedExpense.id)) return false;
+
+    this.cards = this.cards.map(c => c.id === Number(cardId)
+      ? { ...c, gastos: c.gastos.map(expense => expense.id === updatedExpense.id ? updatedExpense : expense) }
+      : c);
+    this.cardsSubject.next([...this.cards]);
+    void this.saveTarjetas();
+    return true;
+  }
+
+  getGastosProyectados(cardId: number = 0) {
     const cardsToProcess = cardId != 0
       ? this.cards.filter(c => c.id == cardId )
       : this.cards;
@@ -197,34 +215,36 @@ export class CreditCardService {
     const allGastos = cardsToProcess.reduce((acc, c) => acc.concat(c.gastos), [] as any[]);
 
     // Aquí tu misma lógica de proyección mensual con cuotas
-    const proyeccion: {mesNumero: number; mes: string; total: number }[] = [];
+    const porMes = new Map<string, number>();
 
-    allGastos.forEach((gasto: any) => {
-      const fecha = new Date(gasto.date);
-      for (let i = 0; i < gasto.cuotas; i++) {
-        const mes = new Date(fecha.getFullYear(), fecha.getMonth() + i, 1);
-        
-        const clave = this.formatFecha(mes.toISOString());
-
-        const existente = proyeccion.find(p => p.mes === clave);
-        if (existente) {
-          existente.total += gasto.amount;
-        } else {
-          proyeccion.push({mesNumero:fecha.getMonth(), mes: clave, total: gasto.amount });
-        }
+    allGastos.forEach((gasto: Expense) => {
+      const cuotas = Math.max(1, Number(gasto.cuotas) || 1);
+      const inicio = this.parseLocalDate(gasto.fechaPrimerVencimiento || gasto.date);
+      const montoCuota = Number(gasto.amount) || (Number(gasto.total) / cuotas);
+      for (let i = 0; i < cuotas; i++) {
+        const fechaCuota = new Date(inicio.getFullYear(), inicio.getMonth() + i, 1);
+        const clave = `${fechaCuota.getFullYear()}-${String(fechaCuota.getMonth() + 1).padStart(2, '0')}`;
+        porMes.set(clave, (porMes.get(clave) || 0) + montoCuota);
       }
     });
 
-    return proyeccion.sort((a, b) =>
-      a.mesNumero - b.mesNumero
-    );
+    return [...porMes.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([mes, total]) => ({
+      mes: this.formatFecha(`${mes}-01`),
+      total
+    }));
+  }
+
+  private parseLocalDate(value: string | Date): Date {
+    if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+    return new Date(year, (month || 1) - 1, day || 1);
   }
 
   formatFecha(fecha: string): string {
     const d = new Date(fecha);
 
     // Esto da "mayo de 2024"
-    let texto = d.toLocaleDateString("es-CL", {
+    let texto = this.parseLocalDate(fecha).toLocaleDateString("es-CL", {
       month: "long",
       year: "numeric"
     });

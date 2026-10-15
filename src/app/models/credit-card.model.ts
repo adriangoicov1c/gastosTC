@@ -1,6 +1,7 @@
 export interface CreditCard {
   id: number;
   name: string;
+  diaCorte: number;
   gastos: Expense[];
 }
 
@@ -11,6 +12,8 @@ export interface Expense {
   date: string;
   cuotas: number;
   total: number;
+  fechaPrimerVencimiento: Date;
+  fechaUltimoVencimiento: Date;
 }
 
 export interface MonthlyExpense {
