@@ -6,14 +6,14 @@ export interface CreditCard {
 }
 
 export interface Expense {
-  id: number;
-  name: string;
-  amount: number;
-  date: string;
-  cuotas: number;
-  total: number;
-  fechaPrimerVencimiento: Date;
-  fechaUltimoVencimiento: Date;
+  id: number ;
+  name: string | null;
+  amount: number | null;
+  date: string | Date | null;
+  cuotas: number | null;
+  total: number | null;
+  fechaPrimerVencimiento: Date | null;
+  fechaUltimoVencimiento: Date | null;
 }
 
 export interface MonthlyExpense {

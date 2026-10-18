@@ -234,9 +234,9 @@ export class CreditCardService {
     }));
   }
 
-  private parseLocalDate(value: string | Date): Date {
+  private parseLocalDate(value: string | Date | null): Date {
     if (value instanceof Date) return new Date(value.getFullYear(), value.getMonth(), value.getDate());
-    const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+    const [year, month, day] = value?.slice(0, 10).split('-').map(Number) || [0, 0, 0];
     return new Date(year, (month || 1) - 1, day || 1);
   }
 

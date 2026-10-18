@@ -14,4 +14,11 @@ describe('NewExpensePage', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('formats the amount while keeping its numeric value', () => {
+    component.onAmountInput('1234567');
+
+    expect(component.amountInput).toBe('1.234.567');
+    expect(component.expense.total).toBe(1234567);
+  });
 });

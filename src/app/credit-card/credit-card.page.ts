@@ -58,7 +58,7 @@ export class CreditCardPage implements OnInit {
       this.navCtrl.back(); // vuelve a la página anterior en el stack
     }
 
-    async deleteExpense(expenseId: number, expenseName: string) {
+    async deleteExpense(expenseId: number, expenseName: string | null) {
       const alert = await this.alertController.create({
         header: 'Eliminar gasto',
         message: `¿Quieres eliminar “${expenseName}”?`,
